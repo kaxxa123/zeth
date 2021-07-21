@@ -212,13 +212,17 @@ libff::bit_vector sha256_ethereum<FieldT>::get_hash(
 {
     libsnark::protoboard<FieldT> pb;
 
+    libsnark::pb_variable<FieldT> ZERO;
+    ZERO.allocate(pb, "ZERO");
+    
     libsnark::block_variable<FieldT> input_block(
         pb, libsnark::SHA256_block_size, "input_block");
     libsnark::digest_variable<FieldT> output_variable(
         pb, libsnark::SHA256_digest_size, "output_variable");
     sha256_ethereum<FieldT> eth_hasher(
-        pb, input_block, output_variable, "eth_hasher_gadget");
-
+        pb, ZERO, input_block, output_variable, "eth_hasher_gadget");
+    
+    pb.val(ZERO) = FieldT::zero();
     input_block.generate_r1cs_witness(input);
     eth_hasher.generate_r1cs_witness();
 
